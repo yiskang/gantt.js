@@ -479,5 +479,6 @@ Temporary Items
 node_modules/
 dist/
 .playwright-mcp/
+.claude.local.md
 
 !.claude/settings.local.json
