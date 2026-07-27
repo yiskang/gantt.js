@@ -761,9 +761,12 @@
                             h = `M ${sX} ${sY} L ${sX + offset} ${sY} L ${sX + offset} ${eY} L ${eX} ${eY}`;
                         } else {
                             // Successor starts before the predecessor ends (+ buffer): a direct elbow
-                            // would cut straight through the bar and its label, so detour through the
-                            // gap between the two rows instead (their midpoint is exactly that gap).
-                            const detourY = (sY + eY) / 2;
+                            // would cut straight through the bar and its label, so detour through a row
+                            // gap instead. The raw midpoint only lands in a gap when the two rows are
+                            // adjacent; when a row sits between them, snap to the nearest row boundary
+                            // so the detour never lands on another row's bar/label.
+                            const rowHeight = this.options.rowHeight;
+                            const detourY = Math.round((sY + eY) / 2 / rowHeight) * rowHeight;
 
                             h = `M ${sX} ${sY} L ${sX + offset} ${sY} L ${sX + offset} ${detourY} L ${eX - offset} ${detourY} L ${eX - offset} ${eY} L ${eX} ${eY}`;
                         }
