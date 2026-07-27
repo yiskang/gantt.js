@@ -22,6 +22,14 @@ export class GanttChart {
         return Boolean(task.parentId && this.collapsedIds.has(task.parentId));
     }
 
+    canReparent(draggedId, targetId) {
+        if (!draggedId || draggedId === targetId) return false;
+        if (this.summaryIds.has(draggedId)) return false;
+        const target = this.tasks.find(t => t.id === targetId);
+        if (target && target.parentId) return false;
+        return true;
+    }
+
     addEventListener(eventType, callback) {
         if (!this.eventListeners[eventType]) {
             this.eventListeners[eventType] = [];
@@ -452,7 +460,7 @@ export class GanttChart {
         noneOption.textContent = 'None';
         parentSelect.appendChild(noneOption);
 
-        this.rawTasks.filter(t => t.id !== task.id).forEach(t => {
+        this.rawTasks.filter(t => t.id !== task.id && this.canReparent(task.id, t.id)).forEach(t => {
             const option = document.createElement('option');
             option.value = t.id;
             option.textContent = t.name;
@@ -560,6 +568,8 @@ export class GanttChart {
 
             this.rawTasks[s] = { ...n, ...e }
         }
+
+        if (e.parentId) this.collapsedIds.delete(e.parentId);
 
         this.render();
     }

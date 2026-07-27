@@ -51,10 +51,7 @@ export class Task {
 
         this.sidebarElement.addEventListener('dragover', (e) => {
             const draggedId = this.gantt.dragState;
-            if (!draggedId || draggedId === this.id) return;
-            const draggedIsSummary = this.gantt.summaryIds.has(draggedId);
-            const targetHasParent = Boolean(this.parentId);
-            if (draggedIsSummary || targetHasParent) return;
+            if (!this.gantt.canReparent(draggedId, this.id)) return;
 
             e.preventDefault();
             this.sidebarElement.classList.add('drop-target-valid');
@@ -67,6 +64,7 @@ export class Task {
         this.sidebarElement.addEventListener('drop', (e) => {
             e.preventDefault();
             this.sidebarElement.classList.remove('drop-target-valid');
+            if (!this.gantt.canReparent(this.gantt.dragState, this.id)) return;
             this.gantt.updateTask(this.gantt.dragState, { parentId: this.id });
         });
 
