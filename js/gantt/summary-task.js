@@ -3,6 +3,11 @@ import { Task } from './task.js';
 import { DateHelper } from './utils.js';
 
 export class SummaryTask extends Task {
+    render(index) {
+        super.render(index);
+        this.barElement.classList.add('summary-bar');
+    }
+
     recomputeFromChildren(allTasks) {
         const children = allTasks.filter(t => t.parentId === this.id);
         if (children.length === 0) return;

@@ -317,6 +317,50 @@ body {
     cursor: ew-resize;
 }
 
+.gantt-task-bar.summary-bar {
+    top: 6px;
+    height: 8px;
+    background-color: #37474f;
+    border: none;
+    border-radius: 0;
+}
+
+.gantt-task-bar.summary-bar::before,
+.gantt-task-bar.summary-bar::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    width: 0;
+    height: 0;
+    border-top: 6px solid #37474f;
+}
+
+.gantt-task-bar.summary-bar::before {
+    left: 0;
+    border-left: 6px solid transparent;
+}
+
+.gantt-task-bar.summary-bar::after {
+    right: 0;
+    border-right: 6px solid transparent;
+}
+
+.gantt-task-bar.summary-bar .gantt-task-progress-actual,
+.gantt-task-bar.summary-bar .gantt-task-progress-animation {
+    background-color: var(--primary-color);
+}
+
+.gantt-task-bar.summary-bar .gantt-task-label {
+    top: 10px;
+    transform: translateY(-50%);
+    color: #37474f;
+    font-weight: 600;
+}
+
+.gantt-task-bar.summary-bar .gantt-task-handle {
+    display: none;
+}
+
 #dependency-layer {
     position: absolute;
     top: 0;
