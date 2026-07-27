@@ -17,6 +17,10 @@ export class GanttChart {
         this.render();
     }
 
+    isHiddenTask(task) {
+        return Boolean(task.parentId && this.collapsedIds.has(task.parentId));
+    }
+
     addEventListener(eventType, callback) {
         if (!this.eventListeners[eventType]) {
             this.eventListeners[eventType] = [];
@@ -61,7 +65,7 @@ export class GanttChart {
         let visibleRowIndex = 0;
         this.visibleRowCount = 0;
         this.tasks.forEach(task => {
-            const isHidden = task.parentId && this.collapsedIds.has(task.parentId);
+            const isHidden = this.isHiddenTask(task);
             task.render(visibleRowIndex, !isHidden);
             if (!isHidden) {
                 visibleRowIndex++;
@@ -345,6 +349,9 @@ export class GanttChart {
             t.dependencies.forEach(d => {
                 const p = this.tasks.find(t => t.id === d);
                 if (!p) return;
+
+                if (p.id === t.parentId || t.id === p.parentId) return;
+                if (this.isHiddenTask(t) || this.isHiddenTask(p)) return;
 
                 const sX = p.left + p.width, sY = p.y, eX = t.left, eY = t.y, a = document.createElementNS('http://www.w3.org/2000/svg', 'path');
                 let h;
