@@ -133,7 +133,29 @@ Two mechanisms, both kept, addressing different layers:
    dependencies (e.g. "Phase 3" → "UI/UX Mockups") aren't parent/child, so
    they render exactly as before.
 
-## 6. Testing / verification
+## 6. Animation & event dispatch
+
+A summary bar isn't independent work — it's "active" for its entire derived
+span, which is the union of all its children's spans. If it participated in
+`GanttChart.updateAnimation()` like a normal task, it would fire a
+`task-active` event simultaneously with whichever child is genuinely active
+for the whole time the phase is running, and its animation-progress fill
+would just be a blended restatement of progress already visible in its
+children's own rows. Both are redundant signals for any listener, so
+`SummaryTask` excludes itself from both:
+
+- `SummaryTask.updateAnimationProgress()`, `enterAnimationMode()`, and
+  `exitAnimationMode()` are no-op overrides — a summary bar's
+  animation-progress fill never appears, regardless of playback state.
+- `GanttChart.updateAnimation()`'s active-task loop (the one that calls
+  `dispatchEvent('task-active', ...)`) skips any task that is a summary —
+  only genuine leaf tasks can be "active."
+
+A consumer that wants "is anything in this phase active right now" can
+already derive it by combining the `task-active` events of the phase's
+children; that composition isn't provided out of the box.
+
+## 7. Testing / verification
 
 No test framework exists in this project (Vite + a single `js/main.js`), so
 verification is manual, in the browser, using the current sample data plus
@@ -153,6 +175,9 @@ Development" and "Frontend Development" as the real test case):
   normally.
 - A deliberately reintroduced child → own-parent dependency does not draw an
   arrow at all (guard rail), and doesn't error.
+- During animation playback, a summary bar's progress fill never appears and
+  no `task-active` event fires for it, even while its children are actively
+  animating and dispatching their own `task-active` events.
 
 ## Out of scope
 
