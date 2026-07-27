@@ -150,9 +150,14 @@ builds (bar, progress divs, label, handles) — no new element types. It adds a
   class if the drop would be valid; invalid targets get no highlight (and
   the drop is simply ignored if attempted). No new drop-zone UI is
   introduced.
-- **Un-parenting**: only via the existing edit-modal "Parent: None" option —
-  dragging only ever sets a parent, never clears one. A dedicated
-  drag-to-remove zone is out of scope.
+- **Un-parenting**: a thin, always-visible strip below the last sidebar row
+  (e.g. "Drop here to remove from phase") acts as a drop target. It only
+  highlights as valid while dragging a task that currently has a `parentId`
+  — dragging a task that has no parent over it does nothing on drop, same as
+  any other invalid target. Dropping there calls
+  `this.gantt.updateTask(draggedId, { parentId: null })`. The edit modal's
+  existing "Parent: None" option keeps working too, as a second way to do
+  the same thing.
 
 ## 7. Dependency-arrow handling
 
@@ -228,9 +233,10 @@ Development" and "Frontend Development" as the real test case):
 - Dragging a leaf task onto a top-level task sets its `parentId`; dragging a
   task that already has children, or dropping onto a task that already has a
   `parentId`, is rejected (no highlight, no-op on drop).
+- Dragging a task that has a `parentId` onto the bottom-of-list strip clears
+  its `parentId`; the strip only highlights while such a task is being
+  dragged, and dragging a task with no parent over it is a no-op on drop.
 
 ## Out of scope
 
 - Multi-level nesting (phase-of-phases).
-- Drag-and-drop to remove a parent (un-parenting stays a manual edit-modal
-  action).
