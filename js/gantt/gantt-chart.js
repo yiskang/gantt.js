@@ -3,6 +3,7 @@ import { DateHelper, GuidHelper } from './utils.js';
 import { Task } from './task.js';
 import { AnimationController } from './animation-controller.js';
 import { Modal } from './modal.js';
+import { SummaryTask } from './summary-task.js';
 
 export class GanttChart {
     constructor(containerId, tasks, options) {
@@ -48,12 +49,15 @@ export class GanttChart {
         this.renderTimeline();
         this.renderGridLines();
 
-        this.tasks = [];
-        this.rawTasks.forEach((taskData, index) => {
-            const task = new Task(this, taskData);
-            this.tasks.push(task);
-            task.render(index);
+        this.summaryIds = new Set(this.rawTasks.map(t => t.parentId).filter(Boolean));
+
+        this.tasks = this.rawTasks.map(taskData =>
+            this.summaryIds.has(taskData.id) ? new SummaryTask(this, taskData) : new Task(this, taskData)
+        );
+        this.tasks.forEach(task => {
+            if (task instanceof SummaryTask) task.recomputeFromChildren(this.tasks);
         });
+        this.tasks.forEach((task, index) => task.render(index));
 
         this.renderDependencies();
         this.animationController = new AnimationController(this, this.animationControls);
