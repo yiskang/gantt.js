@@ -4,7 +4,7 @@
 <head>
     <meta charset='UTF-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-    <title>JavaScript Gantt Chart - Events & Enhanced Timeline</title>
+    <title>JavaScript Gantt Chart</title>
     <style>
         /* --- Root Variables & Body --- */
         :root {
@@ -17,6 +17,8 @@
             --primary-color-light: #a6d8ff;
             --handle-width: 8px;
             --dependency-line-color: #f44336;
+            --actual-progress-color: #28a745;
+            --animation-progress-color: #ffc107;
         }
 
         body {
@@ -112,7 +114,8 @@
         }
 
         .gantt-sidebar-header {
-            height: var(--header-height);
+            /* height: var(--header-height); */
+            height: 78px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -265,9 +268,31 @@
         }
 
         .gantt-task-progress {
+            width: 100%;
             height: 100%;
-            background-color: var(--primary-color);
             border-radius: 3px 0 0 3px;
+            position: relative;
+        }
+
+        .gantt-task-progress-actual {
+            height: 100%;
+            background-color: var(--actual-progress-color);
+            border-radius: 3px 0 0 3px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .gantt-task-progress-animation {
+            height: 100%;
+            background-color: var(--animation-progress-color);
+            border-radius: 3px 0 0 3px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
         .gantt-task-label {
@@ -322,12 +347,27 @@
 
         #animation-progress-line {
             position: absolute;
-            top: var(--header-height);
+            /* top: var(--header-height); */
+            top: 0;
             bottom: 0;
             width: 2px;
-            background-color: rgba(255, 0, 0, 0.7);
+            background-color: rgba(255, 0, 0, 0);
             z-index: 3;
             pointer-events: none;
+            display: none;
+        }
+
+        #animation-progress-line.show {
+            background-color: rgba(255, 0, 0, 0.7);
+            display: unset;
+        }
+
+        .gantt-task-bar.animation-mode .gantt-task-progress-actual {
+            opacity: 0;
+        }
+
+        .gantt-task-bar.animation-mode .gantt-task-progress-animation {
+            opacity: 1;
         }
 
         /* --- Modal Styles (Unchanged) --- */
@@ -440,6 +480,16 @@
             }
         };
 
+        const GuidHelper = {
+            generateGuid: () => {
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                    const r = Math.random() * 16 | 0;
+                    const v = c == 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                });
+            }
+        };
+
         // --- Modal Class ---
         class Modal {
             constructor(title, formElement, onSave) {
@@ -542,7 +592,7 @@
                 const deleteBtn = document.createElement('span');
                 deleteBtn.className = 'delete-task-btn';
                 deleteBtn.title = 'Delete Task';
-                deleteBtn.innerHTML = '&#128465;'; // Acceptable for entities
+                deleteBtn.innerHTML = '&#128465;';
 
                 this.sidebarElement.appendChild(taskNameSpan);
                 this.sidebarElement.appendChild(deleteBtn);
@@ -561,8 +611,15 @@
                 this.barElement = document.createElement('div');
                 this.barElement.className = 'gantt-task-bar';
 
-                const progressDiv = document.createElement('div');
-                progressDiv.className = 'gantt-task-progress';
+                // Updated progress structure with two progress bars
+                const progressContainer = document.createElement('div');
+                progressContainer.className = 'gantt-task-progress';
+
+                const actualProgressDiv = document.createElement('div');
+                actualProgressDiv.className = 'gantt-task-progress-actual';
+
+                const animationProgressDiv = document.createElement('div');
+                animationProgressDiv.className = 'gantt-task-progress-animation';
 
                 const labelSpan = document.createElement('span');
                 labelSpan.className = 'gantt-task-label';
@@ -573,12 +630,17 @@
                 const rightHandle = document.createElement('div');
                 rightHandle.className = 'gantt-task-handle gantt-task-handle-right';
 
-                this.barElement.appendChild(progressDiv);
+                progressContainer.appendChild(actualProgressDiv);
+                progressContainer.appendChild(animationProgressDiv);
+
+                this.barElement.appendChild(progressContainer);
                 this.barElement.appendChild(labelSpan);
                 this.barElement.appendChild(leftHandle);
                 this.barElement.appendChild(rightHandle);
 
-                this.progressElement = progressDiv;
+                // Store references to both progress elements
+                this.actualProgressElement = actualProgressDiv;
+                this.animationProgressElement = animationProgressDiv;
                 this.labelElement = labelSpan;
 
                 this.taskRowElement.appendChild(this.barElement);
@@ -597,9 +659,34 @@
 
                 this.barElement.style.left = `${this.left}px`;
                 this.barElement.style.width = `${this.width}px`;
-                this.progressElement.style.width = `${this.progress}%`;
+
+                // Set actual progress from task data
+                this.actualProgressElement.style.width = `${this.progress}%`;
+
                 this.labelElement.textContent = this.name;
                 this.sidebarElement.querySelector('.task-name').textContent = this.name;
+            }
+
+            updateAnimationProgress(currentDate) {
+                let progressPercent;
+                if (currentDate < this.start) {
+                    progressPercent = 0;
+                } else if (currentDate >= this.end) {
+                    progressPercent = 100;
+                } else {
+                    progressPercent = ((currentDate - this.start) / (this.end - this.start)) * 100;
+                }
+                this.animationProgressElement.style.width = `${progressPercent}%`;
+            }
+
+            enterAnimationMode() {
+                this.barElement.classList.add('animation-mode');
+            }
+
+            exitAnimationMode() {
+                this.barElement.classList.remove('animation-mode');
+                // Reset animation progress
+                this.animationProgressElement.style.width = '0%';
             }
 
             updateProgress(currentDate) {
@@ -727,6 +814,10 @@
             play() {
                 if (this.isPlaying) return;
                 this.isPlaying = true;
+
+                // Enter animation mode for all tasks
+                this.gantt.tasks.forEach(task => task.enterAnimationMode());
+
                 this.lastUpdateTime = performance.now();
                 this.animate();
             }
@@ -738,12 +829,20 @@
 
             stop() {
                 this.pause();
+
+                // Exit animation mode for all tasks
+                this.gantt.tasks.forEach(task => task.exitAnimationMode());
+
                 this.currentTime = new Date(this.gantt.chartStartDate);
                 this.gantt.updateAnimation(this.currentTime);
             }
 
             nextFrame() {
                 this.pause();
+
+                // Ensure animation mode is active
+                this.gantt.tasks.forEach(task => task.enterAnimationMode());
+
                 this.currentTime = DateHelper.addDays(this.currentTime, 1);
                 if (this.currentTime > this.gantt.chartEndDate) {
                     this.currentTime = new Date(this.gantt.chartEndDate);
@@ -753,6 +852,10 @@
 
             prevFrame() {
                 this.pause();
+
+                // Ensure animation mode is active
+                this.gantt.tasks.forEach(task => task.enterAnimationMode());
+
                 this.currentTime = DateHelper.addDays(this.currentTime, -1);
                 if (this.currentTime < this.gantt.chartStartDate) {
                     this.currentTime = new Date(this.gantt.chartStartDate);
@@ -760,8 +863,16 @@
                 this.gantt.updateAnimation(this.currentTime);
             }
 
+
+            reset() {
+                this.stop();
+                this.gantt.animationProgressLine.classList.remove('show');
+            }
+
             animate(timestamp) {
                 if (!this.isPlaying) return;
+
+                this.gantt.animationProgressLine.classList.add('show');
 
                 const elapsed = timestamp - this.lastUpdateTime;
                 if (elapsed >= this.speed) {
@@ -782,10 +893,36 @@
         class GanttChart {
             constructor(containerId, tasks, options) {
                 this.appContainer = document.getElementById(containerId);
-                this.rawTasks = tasks.map(t => ({ ...t, id: t.id ?? Date.now() + Math.random() }));
+                this.rawTasks = tasks.map(t => ({ ...t, id: t.id ?? GuidHelper.generateGuid() }));
                 this.options = { dayWidth: 30, rowHeight: 32, ...options };
                 this.tasks = [];
+                this.eventListeners = {};
+
                 this.render();
+            }
+
+            addEventListener(eventType, callback) {
+                if (!this.eventListeners[eventType]) {
+                    this.eventListeners[eventType] = [];
+                }
+                this.eventListeners[eventType].push(callback);
+            }
+
+            removeEventListener(eventType, callback) {
+                if (!this.eventListeners[eventType]) return;
+
+                const index = this.eventListeners[eventType].indexOf(callback);
+                if (index > -1) {
+                    this.eventListeners[eventType].splice(index, 1);
+                }
+            }
+
+            dispatchEvent(eventType, eventData) {
+                if (!this.eventListeners[eventType]) return;
+
+                this.eventListeners[eventType].forEach(callback => {
+                    callback(eventData);
+                });
             }
 
             render() {
@@ -1047,17 +1184,17 @@
             }
 
             updateAnimation(currentTime) {
-                // Update visual progress for all tasks
+                // Update animation progress for all tasks
                 this.tasks.forEach(task => {
-                    task.updateProgress(currentTime);
+                    task.updateAnimationProgress(currentTime);
 
                     // Check if the task is active and dispatch an event
                     if (currentTime >= task.start && currentTime < task.end) {
-                        const event = new CustomEvent('gantt-task-active', {
-                            bubbles: true,
-                            detail: { task }
+                        this.dispatchEvent('task-active', {
+                            task: task,
+                            currentTime: currentTime,
+                            ganttChart: this
                         });
-                        this.appContainer.dispatchEvent(event);
                     }
                 });
 
@@ -1074,7 +1211,7 @@
                     if (!t.dependencies) return;
 
                     t.dependencies.forEach(d => {
-                        const p = this.tasks.find(t => t.id == d);
+                        const p = this.tasks.find(t => t.id === d);
                         if (!p) return;
 
                         const sX = p.left + p.width, sY = p.y, eX = t.left, eY = t.y, a = document.createElementNS('http://www.w3.org/2000/svg', 'path'), h = `M ${sX} ${sY} L ${sX + 20} ${sY} L ${sX + 20} ${eY} L ${eX} ${eY}`;
@@ -1183,7 +1320,7 @@
                     }
                     this.rawTasks.push({
                         ...data,
-                        id: Date.now(),
+                        id: GuidHelper.generateGuid(),
                         progress: 0,
                         dependencies: data.dependencies.map(Number)
                     });
@@ -1199,7 +1336,7 @@
                 const modal = new Modal('Edit Task', formElement, data => {
                     this.updateTask(taskId, {
                         ...data,
-                        dependencies: data.dependencies.map(Number)
+                        dependencies: data.dependencies || []
                     });
                     return true;
                 });
@@ -1275,23 +1412,24 @@
         // --- Sample Data & Initialization ---
         document.addEventListener('DOMContentLoaded', () => {
             const sampleTasks = [
-                { id: 1, name: 'Phase 1: Planning', start: '2025-08-01', end: '2025-08-07', progress: 100, dependencies: [] },
-                { id: 2, name: 'Market Research', start: '2025-08-04', end: '2025-08-12', progress: 50, dependencies: [1] },
-                { id: 3, name: 'Phase 2: Design', start: '2025-08-13', end: '2025-08-18', progress: 20, dependencies: [2] },
-                { id: 4, name: 'UI/UX Mockups', start: '2025-08-15', end: '2025-08-22', progress: 0, dependencies: [3] },
-                { id: 5, name: 'Phase 3: Development', start: '2025-08-25', end: '2025-10-01', progress: 0, dependencies: [4] },
-                { id: 6, name: 'Backend Development', start: '2025-08-25', end: '2025-09-15', progress: 0, dependencies: [5] },
-                { id: 7, name: 'Frontend Development', start: '2025-09-01', end: '2025-09-25', progress: 0, dependencies: [5, 6] },
-                { id: 8, name: 'Phase 4: Testing & Deploy', start: '2025-10-02', end: '2025-10-15', progress: 0, dependencies: [7] },
-                { id: 9, name: 'New Year Prep', start: '2025-12-28', end: '2026-01-05', progress: 0, dependencies: [8] },
+                { id: '550e8400-e29b-41d4-a716-446655440001', name: 'Phase 1: Planning', start: '2025-08-01', end: '2025-08-07', progress: 100, dependencies: [] },
+                { id: '550e8400-e29b-41d4-a716-446655440002', name: 'Market Research', start: '2025-08-04', end: '2025-08-12', progress: 50, dependencies: ['550e8400-e29b-41d4-a716-446655440001'] },
+                { id: '550e8400-e29b-41d4-a716-446655440003', name: 'Phase 2: Design', start: '2025-08-13', end: '2025-08-18', progress: 20, dependencies: ['550e8400-e29b-41d4-a716-446655440002'] },
+                { id: '550e8400-e29b-41d4-a716-446655440004', name: 'UI/UX Mockups', start: '2025-08-15', end: '2025-08-22', progress: 0, dependencies: ['550e8400-e29b-41d4-a716-446655440003'] },
+                { id: '550e8400-e29b-41d4-a716-446655440005', name: 'Phase 3: Development', start: '2025-08-25', end: '2025-10-01', progress: 0, dependencies: ['550e8400-e29b-41d4-a716-446655440004'] },
+                { id: '550e8400-e29b-41d4-a716-446655440006', name: 'Backend Development', start: '2025-08-25', end: '2025-09-15', progress: 0, dependencies: ['550e8400-e29b-41d4-a716-446655440005'] },
+                { id: '550e8400-e29b-41d4-a716-446655440007', name: 'Frontend Development', start: '2025-09-01', end: '2025-09-25', progress: 0, dependencies: ['550e8400-e29b-41d4-a716-446655440005', '550e8400-e29b-41d4-a716-446655440006'] },
+                { id: '550e8400-e29b-41d4-a716-446655440008', name: 'Phase 4: Testing & Deploy', start: '2025-10-02', end: '2025-10-15', progress: 0, dependencies: ['550e8400-e29b-41d4-a716-446655440007'] },
+                { id: '550e8400-e29b-41d4-a716-446655440009', name: 'New Year Prep', start: '2025-12-28', end: '2026-01-05', progress: 0, dependencies: ['550e8400-e29b-41d4-a716-446655440008'] },
             ];
-            new GanttChart('app-container', sampleTasks);
+
+            const ganttChart = new GanttChart('app-container', sampleTasks);
 
             // --- **NEW**: Example of a 'Third Party' listener ---
             const eventLog = document.getElementById('event-log');
             let lastLoggedId = null;
-            document.getElementById('app-container').addEventListener('gantt-task-active', (e) => {
-                const activeTask = e.detail.task;
+            ganttChart.addEventListener('task-active', (eventData) => {
+                const activeTask = eventData.task;
                 // Only log when the active task changes to avoid flooding the console
                 if (activeTask.id !== lastLoggedId) {
                     const logEntry = document.createElement('div');
@@ -1300,6 +1438,11 @@
                     eventLog.scrollTop = eventLog.scrollHeight; // Auto-scroll
                     lastLoggedId = activeTask.id;
                 }
+            });
+
+            // Example of adding multiple event listeners
+            ganttChart.addEventListener('task-active', (eventData) => {
+                console.log('Another listener - Active task:', eventData.task.name, 'at time:', eventData.currentTime);
             });
         });
     </script>
