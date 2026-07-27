@@ -99,6 +99,7 @@ export class GanttChart {
         // Create main gantt container
         const ganttContainer = document.createElement('div');
         ganttContainer.id = 'gantt-container';
+        ganttContainer.className = 'gantt-chart-root';
 
         // Create animation controls
         const animationControls = document.createElement('div');
@@ -191,6 +192,7 @@ export class GanttChart {
 
         // Cache elements
         Object.assign(this, {
+            ganttContainer: ganttContainer,
             animationControls: animationControls,
             sidebar: ganttSidebar,
             gridContainer: gridContainer,
@@ -528,7 +530,7 @@ export class GanttChart {
             this.render();
             return true;
         });
-        modal.show();
+        modal.show(this.ganttContainer);
     }
 
     editTask(taskId) {
@@ -541,7 +543,7 @@ export class GanttChart {
             });
             return true;
         });
-        modal.show();
+        modal.show(this.ganttContainer);
     }
 
     deleteTask(t) {

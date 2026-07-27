@@ -71,6 +71,10 @@ export class Modal {
         if (this.onSave(data)) this.hide();
     }
 
-    show() { document.body.appendChild(this.overlay); }
-    hide() { document.body.removeChild(this.overlay); }
+    show(mountElement = document.body) {
+        this.mountElement = mountElement;
+        this.mountElement.appendChild(this.overlay);
+    }
+
+    hide() { this.mountElement.removeChild(this.overlay); }
 }
