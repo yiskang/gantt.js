@@ -1,10 +1,11 @@
 {
   "name": "gantt-js",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "vite"
   },
   "devDependencies": {
-    "vite": "^5"
+    "vite": "^8"
   }
 }

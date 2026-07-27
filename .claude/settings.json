@@ -41,6 +41,12 @@
         "~/.gnupg",
         "~/.config/gcloud"
       ]
+    },
+
+    "network": {
+      "allowedDomains": [
+        "registry.npmjs.org"
+      ]
     }
   }
 }
