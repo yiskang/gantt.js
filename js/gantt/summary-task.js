@@ -12,6 +12,14 @@ export class SummaryTask extends Task {
         // Summary bars are derived, not draggable/resizable.
     }
 
+    updateAnimationProgress() {
+        // Summary bars never show an animation-progress fill.
+    }
+
+    enterAnimationMode() {}
+
+    exitAnimationMode() {}
+
     getSidebarPrefixElement() {
         const chevron = document.createElement('span');
         chevron.className = 'gantt-summary-chevron';

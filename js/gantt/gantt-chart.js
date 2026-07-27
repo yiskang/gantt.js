@@ -325,8 +325,8 @@ export class GanttChart {
         this.tasks.forEach(task => {
             task.updateAnimationProgress(currentTime);
 
-            // Check if the task is active and dispatch an event
-            if (currentTime >= task.start && currentTime < task.end) {
+            // Check if the task is active and dispatch an event (summary tasks never fire this)
+            if (!this.summaryIds.has(task.id) && currentTime >= task.start && currentTime < task.end) {
                 this.dispatchEvent('task-active', {
                     task: task,
                     currentTime: currentTime,
