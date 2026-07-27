@@ -744,6 +744,8 @@
             // --- Other GanttChart Methods (CRUD, Dependencies, etc. - Unchanged and minified) ---
             renderDependencies() {
                 this.dependencyLayer.innerHTML = this.dependencyLayer.querySelector('defs').outerHTML;
+                const offset = 20;
+
                 this.tasks.forEach(t => {
                     if (!t.dependencies) return;
 
@@ -751,7 +753,21 @@
                         const p = this.tasks.find(t => t.id === d);
                         if (!p) return;
 
-                        const sX = p.left + p.width, sY = p.y, eX = t.left, eY = t.y, a = document.createElementNS('http://www.w3.org/2000/svg', 'path'), h = `M ${sX} ${sY} L ${sX + 20} ${sY} L ${sX + 20} ${eY} L ${eX} ${eY}`;
+                        const sX = p.left + p.width, sY = p.y, eX = t.left, eY = t.y, a = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                        let h;
+
+                        if (eX >= sX + offset) {
+                            // Enough room between the bars: simple elbow that never crosses a task bar.
+                            h = `M ${sX} ${sY} L ${sX + offset} ${sY} L ${sX + offset} ${eY} L ${eX} ${eY}`;
+                        } else {
+                            // Successor starts before the predecessor ends (+ buffer): a direct elbow
+                            // would cut straight through the bar and its label, so detour through the
+                            // gap between the two rows instead (their midpoint is exactly that gap).
+                            const detourY = (sY + eY) / 2;
+
+                            h = `M ${sX} ${sY} L ${sX + offset} ${sY} L ${sX + offset} ${detourY} L ${eX - offset} ${detourY} L ${eX - offset} ${eY} L ${eX} ${eY}`;
+                        }
+
                         a.setAttribute('d', h);
                         a.setAttribute('class', 'dependency-line');
                         a.setAttribute('marker-end', 'url(#arrow)');
