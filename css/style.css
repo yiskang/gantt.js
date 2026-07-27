@@ -353,7 +353,7 @@ body {
 .gantt-task-bar.summary-bar .gantt-task-label {
     top: 10px;
     transform: translateY(-50%);
-    color: #37474f;
+    color: #222;
     font-weight: 600;
 }
 
