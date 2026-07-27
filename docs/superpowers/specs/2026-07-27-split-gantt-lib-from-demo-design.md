@@ -1,5 +1,7 @@
 # Split Gantt Library from Demo Code
 
+> **Superseded paths:** This document predates a later `src/`/`demo/` restructuring (commit `c83a41f`) that moved the `js/gantt/*.js` layout produced by this spec to `src/*.js`, and `js/main.js`/`index.html` to `demo/main.js`/`demo/index.html`. `css/style.css` (untouched by this spec) now lives at `src/style.css`.
+
 ## Motivation
 
 `js/main.js` currently holds everything: the reusable library classes

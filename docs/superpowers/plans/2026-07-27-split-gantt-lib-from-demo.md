@@ -1,5 +1,7 @@
 # Split Gantt Library from Demo Code Implementation Plan
 
+> **Superseded paths:** This document predates a later `src/`/`demo/` restructuring (commit `c83a41f`) that moved the `js/gantt/*.js` layout produced by this plan to `src/*.js`, and `js/main.js`/`index.html` to `demo/main.js`/`demo/index.html`. `css/style.css` (untouched by this plan) now lives at `src/style.css`.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Split `js/main.js`'s global-scope library classes into one ES-module file per component under `js/gantt/`, leaving `js/main.js` as a demo-only entry point, with no behavior change.

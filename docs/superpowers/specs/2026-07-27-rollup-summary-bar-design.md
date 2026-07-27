@@ -1,5 +1,7 @@
 # Rollup / Summary Bar Design
 
+> **Superseded paths:** This document predates the `src/`/`demo/` restructuring (commit `c83a41f`). File paths referenced here as `js/gantt/*.js` now live under `src/*.js`, and `css/style.css` now lives at `src/style.css`.
+
 ## Motivation
 
 "Phase 3: Development" is conceptually a rollup over "Backend Development" and

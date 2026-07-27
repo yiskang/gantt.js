@@ -1,5 +1,7 @@
 # Rollup / Summary Bar Implementation Plan
 
+> **Superseded paths:** This document predates the `src/`/`demo/` restructuring (commit `c83a41f`). File paths referenced here as `js/gantt/*.js` now live under `src/*.js`, and `css/style.css` now lives at `src/style.css`.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Implement the summary/rollup task type from `docs/superpowers/specs/2026-07-27-rollup-summary-bar-design.md` — a task whose start/end/progress are derived from its `parentId`-linked children, rendered as a distinct bracket bar, excluded from dependency arrows with its own children, collapsible in the sidebar, and re-parentable via drag-and-drop.
