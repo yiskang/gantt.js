@@ -3,13 +3,29 @@ import { Task } from './task.js';
 import { DateHelper } from './utils.js';
 
 export class SummaryTask extends Task {
-    render(index) {
-        super.render(index);
+    render(index, visible = true) {
+        super.render(index, visible);
         this.barElement.classList.add('summary-bar');
     }
 
     addDragListeners() {
         // Summary bars are derived, not draggable/resizable.
+    }
+
+    getSidebarPrefixElement() {
+        const chevron = document.createElement('span');
+        chevron.className = 'gantt-summary-chevron';
+        if (this.gantt.collapsedIds.has(this.id)) chevron.classList.add('collapsed');
+        chevron.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (this.gantt.collapsedIds.has(this.id)) {
+                this.gantt.collapsedIds.delete(this.id);
+            } else {
+                this.gantt.collapsedIds.add(this.id);
+            }
+            this.gantt.render();
+        });
+        return chevron;
     }
 
     recomputeFromChildren(allTasks) {

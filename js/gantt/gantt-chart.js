@@ -12,6 +12,7 @@ export class GanttChart {
         this.options = { dayWidth: 30, rowHeight: 32, ...options };
         this.tasks = [];
         this.eventListeners = {};
+        this.collapsedIds = new Set();
 
         this.render();
     }
@@ -47,7 +48,6 @@ export class GanttChart {
         this.calculateDateRange();
         this.createLayout();
         this.renderTimeline();
-        this.renderGridLines();
 
         this.summaryIds = new Set(this.rawTasks.map(t => t.parentId).filter(Boolean));
 
@@ -57,7 +57,19 @@ export class GanttChart {
         this.tasks.forEach(task => {
             if (task instanceof SummaryTask) task.recomputeFromChildren(this.tasks);
         });
-        this.tasks.forEach((task, index) => task.render(index));
+
+        let visibleRowIndex = 0;
+        this.visibleRowCount = 0;
+        this.tasks.forEach(task => {
+            const isHidden = task.parentId && this.collapsedIds.has(task.parentId);
+            task.render(visibleRowIndex, !isHidden);
+            if (!isHidden) {
+                visibleRowIndex++;
+                this.visibleRowCount++;
+            }
+        });
+
+        this.renderGridLines();
 
         this.renderDependencies();
         this.animationController = new AnimationController(this, this.animationControls);
@@ -560,7 +572,7 @@ export class GanttChart {
     }
 
     renderGridLines() {
-        const t = DateHelper.daysBetween(this.chartStartDate, this.chartEndDate) + 1, e = this.rawTasks.length, s = t * this.options.dayWidth, n = e * this.options.rowHeight;
+        const t = DateHelper.daysBetween(this.chartStartDate, this.chartEndDate) + 1, e = this.visibleRowCount, s = t * this.options.dayWidth, n = e * this.options.rowHeight;
         this.grid.style.width = `${s}px`;
         this.grid.style.height = `${n}px`;
         this.dependencyLayer.setAttribute('width', s);

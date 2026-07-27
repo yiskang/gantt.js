@@ -10,12 +10,14 @@ export class Task {
         this.dependencies = data.dependencies || [];
     }
 
-    render(index) {
+    render(index, visible = true) {
         this.y = index * this.gantt.options.rowHeight + this.gantt.options.rowHeight / 2;
 
         // Create sidebar element using DOM API
         this.sidebarElement = document.createElement('div');
         this.sidebarElement.className = 'gantt-sidebar-row';
+
+        const prefixElement = this.getSidebarPrefixElement();
 
         const taskNameSpan = document.createElement('span');
         taskNameSpan.className = 'task-name';
@@ -27,6 +29,7 @@ export class Task {
         deleteBtn.title = 'Delete Task';
         deleteBtn.innerHTML = '&#128465;';
 
+        if (prefixElement) this.sidebarElement.appendChild(prefixElement);
         this.sidebarElement.appendChild(taskNameSpan);
         this.sidebarElement.appendChild(deleteBtn);
 
@@ -35,7 +38,7 @@ export class Task {
             if (confirm(`Delete task '${this.name}'?`)) this.gantt.deleteTask(this.id);
         });
 
-        this.gantt.sidebar.appendChild(this.sidebarElement);
+        if (visible) this.gantt.sidebar.appendChild(this.sidebarElement);
 
         this.taskRowElement = document.createElement('div');
         this.taskRowElement.className = 'gantt-task-row';
@@ -77,7 +80,7 @@ export class Task {
         this.labelElement = labelSpan;
 
         this.taskRowElement.appendChild(this.barElement);
-        this.gantt.taskArea.appendChild(this.taskRowElement);
+        if (visible) this.gantt.taskArea.appendChild(this.taskRowElement);
 
         this.updatePosition();
         this.addDragListeners();
@@ -189,5 +192,9 @@ export class Task {
         };
 
         this.barElement.addEventListener('mousedown', onMouseDown);
+    }
+
+    getSidebarPrefixElement() {
+        return null;
     }
 }

@@ -157,6 +157,23 @@ body {
     visibility: visible;
 }
 
+.gantt-summary-chevron {
+    display: inline-block;
+    width: 12px;
+    margin-right: 4px;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+
+.gantt-summary-chevron::before {
+    content: '\25BC';
+    font-size: 9px;
+}
+
+.gantt-summary-chevron.collapsed {
+    transform: rotate(-90deg);
+}
+
 /* --- Timeline Header --- */
 .gantt-header {
     position: sticky;
