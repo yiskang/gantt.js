@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: '550e8400-e29b-41d4-a716-446655440006', name: 'Backend Development', start: '2026-07-25', end: '2026-08-15', progress: 0, dependencies: ['550e8400-e29b-41d4-a716-446655440004'], parentId: '550e8400-e29b-41d4-a716-446655440005' },
         { id: '550e8400-e29b-41d4-a716-446655440007', name: 'Frontend Development', start: '2026-08-01', end: '2026-08-25', progress: 0, dependencies: ['550e8400-e29b-41d4-a716-446655440006'], parentId: '550e8400-e29b-41d4-a716-446655440005' },
         { id: '550e8400-e29b-41d4-a716-446655440008', name: 'Phase 4: Testing & Deploy', start: '2026-09-01', end: '2026-09-14', progress: 0, dependencies: ['550e8400-e29b-41d4-a716-446655440007'] },
-        { id: '550e8400-e29b-41d4-a716-446655440009', name: 'New Year Prep', start: '2026-12-28', end: '2027-01-05', progress: 0, dependencies: ['550e8400-e29b-41d4-a716-446655440008'] },
+        { id: '550e8400-e29b-41d4-a716-446655440009', name: 'Post-Launch Monitoring', start: '2026-12-28', end: '2027-01-05', progress: 0, dependencies: ['550e8400-e29b-41d4-a716-446655440008'] },
     ];
 
     const ganttChart = new GanttChart('app-container', sampleTasks);
