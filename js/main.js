@@ -973,8 +973,8 @@
                 { id: '550e8400-e29b-41d4-a716-446655440003', name: 'Phase 2: Design', start: '2025-08-13', end: '2025-08-18', progress: 20, dependencies: ['550e8400-e29b-41d4-a716-446655440002'] },
                 { id: '550e8400-e29b-41d4-a716-446655440004', name: 'UI/UX Mockups', start: '2025-08-15', end: '2025-08-22', progress: 0, dependencies: ['550e8400-e29b-41d4-a716-446655440003'] },
                 { id: '550e8400-e29b-41d4-a716-446655440005', name: 'Phase 3: Development', start: '2025-08-25', end: '2025-10-01', progress: 0, dependencies: ['550e8400-e29b-41d4-a716-446655440004'] },
-                { id: '550e8400-e29b-41d4-a716-446655440006', name: 'Backend Development', start: '2025-08-25', end: '2025-09-15', progress: 0, dependencies: ['550e8400-e29b-41d4-a716-446655440005'] },
-                { id: '550e8400-e29b-41d4-a716-446655440007', name: 'Frontend Development', start: '2025-09-01', end: '2025-09-25', progress: 0, dependencies: ['550e8400-e29b-41d4-a716-446655440005', '550e8400-e29b-41d4-a716-446655440006'] },
+                { id: '550e8400-e29b-41d4-a716-446655440006', name: 'Backend Development', start: '2025-08-25', end: '2025-09-15', progress: 0, dependencies: ['550e8400-e29b-41d4-a716-446655440004'] },
+                { id: '550e8400-e29b-41d4-a716-446655440007', name: 'Frontend Development', start: '2025-09-01', end: '2025-09-25', progress: 0, dependencies: ['550e8400-e29b-41d4-a716-446655440006'] },
                 { id: '550e8400-e29b-41d4-a716-446655440008', name: 'Phase 4: Testing & Deploy', start: '2025-10-02', end: '2025-10-15', progress: 0, dependencies: ['550e8400-e29b-41d4-a716-446655440007'] },
                 { id: '550e8400-e29b-41d4-a716-446655440009', name: 'New Year Prep', start: '2025-12-28', end: '2026-01-05', progress: 0, dependencies: ['550e8400-e29b-41d4-a716-446655440008'] },
             ];
