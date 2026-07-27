@@ -414,6 +414,39 @@ export class GanttChart {
         endGroup.appendChild(endLabel);
         endGroup.appendChild(endInput);
 
+        // Parent field
+        const parentGroup = document.createElement('div');
+        parentGroup.className = 'form-group';
+
+        const parentLabel = document.createElement('label');
+        parentLabel.setAttribute('for', 'parentId');
+        parentLabel.textContent = 'Parent';
+
+        const parentSelect = document.createElement('select');
+        parentSelect.name = 'parentId';
+
+        const noneOption = document.createElement('option');
+        noneOption.value = '';
+        noneOption.textContent = 'None';
+        parentSelect.appendChild(noneOption);
+
+        this.rawTasks.filter(t => t.id !== task.id).forEach(t => {
+            const option = document.createElement('option');
+            option.value = t.id;
+            option.textContent = t.name;
+            option.selected = task.parentId === t.id;
+            parentSelect.appendChild(option);
+        });
+
+        parentGroup.appendChild(parentLabel);
+        parentGroup.appendChild(parentSelect);
+
+        const isSummary = this.summaryIds && this.summaryIds.has(task.id);
+        if (isSummary) {
+            startGroup.style.display = 'none';
+            endGroup.style.display = 'none';
+        }
+
         // Dependencies field
         const depsGroup = document.createElement('div');
         depsGroup.className = 'form-group';
@@ -443,6 +476,7 @@ export class GanttChart {
         container.appendChild(nameGroup);
         container.appendChild(startGroup);
         container.appendChild(endGroup);
+        container.appendChild(parentGroup);
         container.appendChild(depsGroup);
 
         return container;
@@ -484,7 +518,9 @@ export class GanttChart {
         this.rawTasks = this.rawTasks.filter(e => e.id !== t);
         this.rawTasks.forEach(e => {
             if (e.dependencies)
-                e.dependencies = e.dependencies.filter(d => d !== t)
+                e.dependencies = e.dependencies.filter(d => d !== t);
+            if (e.parentId === t)
+                e.parentId = null;
         });
 
         this.render()

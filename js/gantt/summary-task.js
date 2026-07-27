@@ -8,6 +8,10 @@ export class SummaryTask extends Task {
         this.barElement.classList.add('summary-bar');
     }
 
+    addDragListeners() {
+        // Summary bars are derived, not draggable/resizable.
+    }
+
     recomputeFromChildren(allTasks) {
         const children = allTasks.filter(t => t.parentId === this.id);
         if (children.length === 0) return;
