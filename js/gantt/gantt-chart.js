@@ -13,6 +13,7 @@ export class GanttChart {
         this.tasks = [];
         this.eventListeners = {};
         this.collapsedIds = new Set();
+        this.dragState = null;
 
         this.render();
     }
@@ -72,6 +73,8 @@ export class GanttChart {
                 this.visibleRowCount++;
             }
         });
+
+        this.renderUnparentDropZone();
 
         this.renderGridLines();
 
@@ -576,6 +579,32 @@ export class GanttChart {
         });
         this.chartStartDate = DateHelper.addDays(m, -5);
         this.chartEndDate = DateHelper.addDays(x, 10);
+    }
+
+    renderUnparentDropZone() {
+        const strip = document.createElement('div');
+        strip.className = 'gantt-unparent-dropzone';
+        strip.textContent = 'Drop here to remove from phase';
+
+        strip.addEventListener('dragover', (e) => {
+            const draggedTask = this.tasks.find(t => t.id === this.dragState);
+            if (!draggedTask || !draggedTask.parentId) return;
+
+            e.preventDefault();
+            strip.classList.add('drop-target-valid');
+        });
+
+        strip.addEventListener('dragleave', () => {
+            strip.classList.remove('drop-target-valid');
+        });
+
+        strip.addEventListener('drop', (e) => {
+            e.preventDefault();
+            strip.classList.remove('drop-target-valid');
+            this.updateTask(this.dragState, { parentId: null });
+        });
+
+        this.sidebar.appendChild(strip);
     }
 
     renderGridLines() {

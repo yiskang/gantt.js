@@ -38,6 +38,38 @@ export class Task {
             if (confirm(`Delete task '${this.name}'?`)) this.gantt.deleteTask(this.id);
         });
 
+        this.sidebarElement.draggable = true;
+
+        this.sidebarElement.addEventListener('dragstart', (e) => {
+            this.gantt.dragState = this.id;
+            e.dataTransfer.setData('text/plain', this.id);
+        });
+
+        this.sidebarElement.addEventListener('dragend', () => {
+            this.gantt.dragState = null;
+        });
+
+        this.sidebarElement.addEventListener('dragover', (e) => {
+            const draggedId = this.gantt.dragState;
+            if (!draggedId || draggedId === this.id) return;
+            const draggedIsSummary = this.gantt.summaryIds.has(draggedId);
+            const targetHasParent = Boolean(this.parentId);
+            if (draggedIsSummary || targetHasParent) return;
+
+            e.preventDefault();
+            this.sidebarElement.classList.add('drop-target-valid');
+        });
+
+        this.sidebarElement.addEventListener('dragleave', () => {
+            this.sidebarElement.classList.remove('drop-target-valid');
+        });
+
+        this.sidebarElement.addEventListener('drop', (e) => {
+            e.preventDefault();
+            this.sidebarElement.classList.remove('drop-target-valid');
+            this.gantt.updateTask(this.gantt.dragState, { parentId: this.id });
+        });
+
         if (visible) this.gantt.sidebar.appendChild(this.sidebarElement);
 
         this.taskRowElement = document.createElement('div');
