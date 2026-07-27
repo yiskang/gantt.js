@@ -115,7 +115,46 @@ builds (bar, progress divs, label, handles) — no new element types. It adds a
   deleted phase become ordinary top-level tasks instead of pointing at a
   dangling id.
 
-## 5. Dependency-arrow handling
+## 5. Collapse/expand in the sidebar
+
+- **State storage**: `GanttChart.render()` rebuilds every `Task`/`SummaryTask`
+  instance from `rawTasks` on every call, so collapse state can't live on the
+  task instances themselves. It lives on `GanttChart` instead —
+  `this.collapsedIds = this.collapsedIds || new Set()` — following the same
+  pattern already used to preserve `scrollLeft` across re-renders.
+- **Affordance**: a small chevron/triangle icon is added to a `SummaryTask`'s
+  sidebar row only (leaf tasks don't get one). Clicking it toggles the task's
+  id in `collapsedIds` and calls `this.render()`.
+- **Layout**: before assigning row indices, `GanttChart.render()` filters out
+  any task whose `parentId` is in `collapsedIds` — those tasks get no
+  sidebar row and no grid row at all (not just visually hidden; they take up
+  no row height), so rows below shift up naturally.
+- **Everything else keeps running**: a hidden child still updates its
+  animation progress and still fires `task-active` — collapsing is purely a
+  display/layout choice, not a data-processing exclusion.
+- **Default state**: expanded (matches current behavior on first load).
+
+## 6. Drag-and-drop re-parenting in the sidebar
+
+- **Mechanism**: sidebar rows become `draggable="true"`. `dragstart` records
+  the dragged task's id; `dragover` (with `preventDefault()`) on another row
+  allows a drop there; `drop` calls
+  `this.gantt.updateTask(draggedId, { parentId: targetId })`, reusing the
+  existing update → re-render pipeline.
+- **Single-level invariant**: a drop is only valid if **both** are true — the
+  dragged task currently has no children of its own (isn't already a
+  summary), and the target task currently has no `parentId` (isn't already a
+  child). One rule, checked on `dragover`, covers every way this could
+  otherwise create two-level nesting or a cycle.
+- **Feedback**: while dragging, the row under the cursor gets a highlight
+  class if the drop would be valid; invalid targets get no highlight (and
+  the drop is simply ignored if attempted). No new drop-zone UI is
+  introduced.
+- **Un-parenting**: only via the existing edit-modal "Parent: None" option —
+  dragging only ever sets a parent, never clears one. A dedicated
+  drag-to-remove zone is out of scope.
+
+## 7. Dependency-arrow handling
 
 Two mechanisms, both kept, addressing different layers:
 
@@ -132,8 +171,13 @@ Two mechanisms, both kept, addressing different layers:
    relying on the routing fix to make it look tolerable. Real cross-phase
    dependencies (e.g. "Phase 3" → "UI/UX Mockups") aren't parent/child, so
    they render exactly as before.
+3. **Collapsed children**: `renderDependencies()` also skips any edge where
+   either endpoint is currently filtered out by a collapsed phase (section
+   5) — no dangling arrow points at a row that isn't drawn. Expanding the
+   phase again restores the arrow on the next render, no separate cleanup
+   needed since it's recomputed from scratch every render.
 
-## 6. Animation & event dispatch
+## 8. Animation & event dispatch
 
 A summary bar isn't independent work — it's "active" for its entire derived
 span, which is the union of all its children's spans. If it participated in
@@ -155,7 +199,7 @@ A consumer that wants "is anything in this phase active right now" can
 already derive it by combining the `task-active` events of the phase's
 children; that composition isn't provided out of the box.
 
-## 7. Testing / verification
+## 9. Testing / verification
 
 No test framework exists in this project (Vite + a single `js/main.js`), so
 verification is manual, in the browser, using the current sample data plus
@@ -178,9 +222,15 @@ Development" and "Frontend Development" as the real test case):
 - During animation playback, a summary bar's progress fill never appears and
   no `task-active` event fires for it, even while its children are actively
   animating and dispatching their own `task-active` events.
+- Collapsing a phase hides its children's sidebar rows and grid rows (rows
+  below shift up) and hides any dependency arrow touching a hidden child;
+  expanding it restores all of the above.
+- Dragging a leaf task onto a top-level task sets its `parentId`; dragging a
+  task that already has children, or dropping onto a task that already has a
+  `parentId`, is rejected (no highlight, no-op on drop).
 
 ## Out of scope
 
 - Multi-level nesting (phase-of-phases).
-- Collapsing/expanding a phase's children in the sidebar.
-- Automatic re-parenting via drag-and-drop in the sidebar.
+- Drag-and-drop to remove a parent (un-parenting stays a manual edit-modal
+  action).
