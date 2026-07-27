@@ -1,4 +1,4 @@
-// js/gantt/gantt-chart.js
+// src/gantt-chart.js
 import { DateHelper, GuidHelper } from './utils.js';
 import { Task } from './task.js';
 import { AnimationController } from './animation-controller.js';

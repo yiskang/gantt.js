@@ -1,4 +1,4 @@
-// js/gantt/modal.js
+// src/modal.js
 export class Modal {
     constructor(title, formElement, onSave) {
         this.title = title;

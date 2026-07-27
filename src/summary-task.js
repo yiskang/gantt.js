@@ -1,4 +1,4 @@
-// js/gantt/summary-task.js
+// src/summary-task.js
 import { Task } from './task.js';
 import { DateHelper } from './utils.js';
 

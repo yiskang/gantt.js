@@ -1,2 +1,2 @@
-// js/gantt/index.js
+// src/index.js
 export { GanttChart } from './gantt-chart.js';

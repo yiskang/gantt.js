@@ -1,4 +1,4 @@
-// js/gantt/utils.js
+// src/utils.js
 export const DateHelper = {
     addDays: (date, days) => {
         const result = new Date(date);

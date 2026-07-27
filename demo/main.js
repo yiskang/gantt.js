@@ -1,5 +1,6 @@
-// js/main.js
-import { GanttChart } from './gantt/index.js';
+// demo/main.js
+import '../src/style.css';
+import { GanttChart } from '../src/index.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const sampleTasks = [

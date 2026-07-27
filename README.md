@@ -23,7 +23,7 @@ Then open the URL Vite prints (defaults to `http://localhost:5174/`).
 ## Usage
 
 ```js
-import { GanttChart } from './js/gantt/index.js';
+import { GanttChart } from './src/index.js';
 
 const tasks = [
   { id: '1', name: 'Design', start: '2026-08-01', end: '2026-08-07', progress: 100, dependencies: [] },
@@ -42,17 +42,18 @@ chart.addEventListener('task-active', ({ task, currentTime }) => {
 ## Project structure
 
 ```
-js/
-  main.js            sample data + app bootstrap
-  gantt/
-    index.js          public entry point (exports GanttChart)
-    gantt-chart.js     core chart: rendering, drag/drop, events
-    task.js            Task model + row/bar rendering
-    summary-task.js    SummaryTask (rollup) model
-    animation-controller.js   "today" progress-line animation
-    modal.js           add/edit task modal
-    utils.js           date and GUID helpers
-css/style.css          chart styling
+src/                    library source
+  index.js               public entry point (exports GanttChart)
+  gantt-chart.js          core chart: rendering, drag/drop, events
+  task.js                 Task model + row/bar rendering
+  summary-task.js         SummaryTask (rollup) model
+  animation-controller.js "today" progress-line animation
+  modal.js                add/edit task modal
+  utils.js                date and GUID helpers
+  style.css               chart styling
+demo/                   sample app (Vite root)
+  index.html
+  main.js                sample data + app bootstrap
 ```
 
 ## License

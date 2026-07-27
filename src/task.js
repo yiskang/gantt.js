@@ -1,4 +1,4 @@
-// js/gantt/task.js
+// src/task.js
 import { DateHelper } from './utils.js';
 
 export class Task {

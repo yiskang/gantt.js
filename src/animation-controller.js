@@ -1,4 +1,4 @@
-// js/gantt/animation-controller.js
+// src/animation-controller.js
 import { DateHelper } from './utils.js';
 
 export class AnimationController {
