@@ -13,9 +13,7 @@
       "Bash(npm run test)",
       "Bash(npm run preview)",
       "Bash(npm test)",
-
       "mcp__codebase-memory-mcp__*",
-
       "mcp__playwright__browser_console_messages",
       "mcp__playwright__browser_navigate",
       "mcp__playwright__browser_wait_for",
@@ -26,10 +24,35 @@
       "mcp__playwright__browser_click",
       "mcp__playwright__browser_type",
       "mcp__playwright__browser_evaluate",
-      "mcp__playwright__browser_run_code_unsafe"
+      "mcp__playwright__browser_run_code_unsafe",
+      "mcp__playwright__browser_hover",
+      "mcp__playwright__browser_handle_dialog",
+      "mcp__playwright__browser_drag"
     ]
   },
   "enabledMcpjsonServers": [
     "playwright"
-  ]
+  ],
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "mcp__playwright__browser_navigate",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "url=$(jq -r '.tool_input.url // \"\"' 2>/dev/null); if echo \"$url\" | grep -qE '^http://localhost:5174($|/)'; then exit 0; else echo \"{\\\"decision\\\":\\\"block\\\",\\\"reason\\\":\\\"Only http://localhost:5174/ URLs are allowed by this project's policy\\\"}\"; exit 2; fi"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__playwright__browser_navigate_back",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo \"{\\\"decision\\\":\\\"block\\\",\\\"reason\\\":\\\"browser_navigate_back is disabled by this project's policy \\u2014 use browser_navigate to http://localhost:5174/ instead\\\"}\"; exit 2"
+          }
+        ]
+      }
+    ]
+  }
 }
