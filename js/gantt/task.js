@@ -122,18 +122,6 @@ export class Task {
         this.animationProgressElement.style.width = '0%';
     }
 
-    updateProgress(currentDate) {
-        let progressPercent;
-        if (currentDate < this.start) {
-            progressPercent = 0;
-        } else if (currentDate >= this.end) {
-            progressPercent = 100;
-        } else {
-            progressPercent = ((currentDate - this.start) / (this.end - this.start)) * 100;
-        }
-        this.progressElement.style.width = `${progressPercent}%`;
-    }
-
     addDragListeners() {
         let startX, startLeft, startWidth;
         let dragMode = null;
