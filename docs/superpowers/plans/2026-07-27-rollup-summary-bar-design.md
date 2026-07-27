@@ -267,7 +267,7 @@ Insert after `css/style.css:318` (the closing `}` of `.gantt-task-handle-right`)
 .gantt-task-bar.summary-bar .gantt-task-label {
     top: 10px;
     transform: translateY(-50%);
-    color: #37474f;
+    color: #222;
     font-weight: 600;
 }
 
@@ -276,7 +276,7 @@ Insert after `css/style.css:318` (the closing `}` of `.gantt-task-handle-right`)
 }
 ```
 
-(`top: 10px; transform: translateY(-50%)` on the label: the bar itself is the label's positioning context, top-anchored at row-offset `6px`. Row center is at `16px` (half of the 32px `--row-height`), which in the bar's local coordinates is `16 - 6 = 10px`. `translateY(-50%)` then centers the label — regardless of its own height — around that point, landing it on the row's center rather than the 8px bar's center.)
+(`top: 10px; transform: translateY(-50%)` on the label: the bar itself is the label's positioning context, top-anchored at row-offset `6px`. Row center is at `16px` (half of the 32px `--row-height`), which in the bar's local coordinates is `16 - 6 = 10px`. `translateY(-50%)` then centers the label — regardless of its own height — around that point, landing it on the row's center rather than the 8px bar's center. Label `color` is `#222`, not the bar's own `#37474f` — an earlier draft of this plan used the same value for both, which made the portion of the label overlapping the 8px bar literally invisible (identical color, zero contrast). `#222` is still low-contrast against the dark bar for that overlapping sliver, but it's readable against the light page background that makes up most of the label's area, and it's no longer a literal color match.)
 
 - [ ] **Step 3: Verify via the dev server**
 
