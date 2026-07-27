@@ -39,6 +39,24 @@ chart.addEventListener('task-active', ({ task, currentTime }) => {
 
 `GanttChart` takes a container element ID, an array of task objects (`id`, `name`, `start`, `end`, `progress`, `dependencies`, and an optional `parentId` for summary/child relationships), and an options object (`dayWidth`, `rowHeight`).
 
+### Via CDN (no build step)
+
+The library is plain ES modules, so it can be loaded directly from a CDN like [jsDelivr's GitHub CDN](https://www.jsdelivr.com/?docs=gh) — no npm publish and no bundler required, just a public GitHub repo:
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/yiskang/gantt.js@v1.0.0/src/style.css">
+<div id="app-container"></div>
+<script type="module">
+  import { GanttChart } from 'https://cdn.jsdelivr.net/gh/yiskang/gantt.js@v1.0.0/src/index.js';
+
+  const chart = new GanttChart('app-container', [
+    { id: '1', name: 'Design', start: '2026-08-01', end: '2026-08-07', progress: 100, dependencies: [] },
+  ]);
+</script>
+```
+
+Unlike npm-backed CDNs, jsDelivr's GitHub mode doesn't read `package.json`'s `main`/`module` fields — always link the full path (`src/index.js`, `src/style.css`). Pin a git tag (`@v1.0.0`) rather than `@main`, since jsDelivr caches branch references for a while and won't immediately reflect new commits. This only works if the GitHub repo is public — jsDelivr's GitHub mode fetches from `raw.githubusercontent.com`, which returns 401 for private repos.
+
 ## Project structure
 
 ```

@@ -1,7 +1,15 @@
 {
   "name": "gantt-js",
-  "private": true,
+  "version": "1.0.0",
   "type": "module",
+  "license": "MIT",
+  "main": "src/index.js",
+  "module": "src/index.js",
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "dev": "vite"
   },
