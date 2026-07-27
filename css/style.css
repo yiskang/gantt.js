@@ -140,6 +140,10 @@ body {
     white-space: nowrap;
 }
 
+.gantt-sidebar-row--child {
+    padding-left: 28px;
+}
+
 .gantt-sidebar-row .task-name {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -382,7 +386,8 @@ body {
 }
 
 .gantt-task-bar.summary-bar .gantt-task-label {
-    top: 10px;
+    top: 15px;
+    left: 20px;
     transform: translateY(-50%);
     color: #222;
     font-weight: 600;

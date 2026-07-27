@@ -16,6 +16,7 @@ export class Task {
         // Create sidebar element using DOM API
         this.sidebarElement = document.createElement('div');
         this.sidebarElement.className = 'gantt-sidebar-row';
+        if (this.parentId) this.sidebarElement.classList.add('gantt-sidebar-row--child');
 
         const prefixElement = this.getSidebarPrefixElement();
 
