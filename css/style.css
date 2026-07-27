@@ -157,8 +157,11 @@
 }
 
 .gantt-summary-chevron {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     width: 12px;
+    height: 12px;
     margin-right: 4px;
     cursor: pointer;
     transition: transform 0.15s ease;
@@ -167,6 +170,7 @@
 .gantt-summary-chevron::before {
     content: '\25BC';
     font-size: 9px;
+    line-height: 1;
 }
 
 .gantt-summary-chevron.collapsed {
