@@ -13,7 +13,7 @@ There is no build, lint, or test script configured — `package.json` only defin
 
 When using Playwright MCP tools (`browser_click`, `browser_hover`, `browser_drag`, etc.), the element parameter is `target` (the ref string from `browser_snapshot`, e.g. `"e14"`) — not `ref`.
 
-**Never start the dev server yourself in the background — ask the user to run `npm run dev`** and work against the instance they start. A project PreToolUse hook also restricts Playwright navigation to `http://localhost:5174/`.
+Default to asking the user to run `npm run dev` themselves and working against the instance they start, rather than starting it yourself in the background. This machine has previously hit `EPERM` errors binding to port 5174 (both in-sandbox and in the user's own shell) that were traced to a host-level setting, not a Vite/sandbox limitation — if that recurs, it's worth diagnosing rather than assuming the dev server can't be started programmatically. A project PreToolUse hook also restricts Playwright navigation to `http://localhost:5174/`.
 
 ## Architecture
 
