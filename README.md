@@ -11,6 +11,8 @@ A dependency-free vanilla JavaScript Gantt chart library. Renders an interactive
 - Animated "today" progress line and a `task-active` event for building external listeners (e.g. an activity log)
 - Add/edit/delete tasks through a built-in modal
 
+![thumbnail](./thumbnail.png)
+
 ## Getting started
 
 ```bash
